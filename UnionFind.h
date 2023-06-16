@@ -126,15 +126,15 @@ class UnionFind
         if(tree1->groupCount >= tree2->groupCount)
         {
             tree2->father = make_shared<UpTreeNode>(tree1);
-            tree2->groupCount += tree1->groupCount;
-            tree1->groupCount = -1;
+            tree1->groupCount += tree2->groupCount;
+            tree2->groupCount = -1;
             return tree1;
         }
         else
         {
             tree1->father = make_shared<UpTreeNode>(tree2);
-            tree1->groupCount += tree2->groupCount;
-            tree2->groupCount = -1;
+            tree2->groupCount += tree1->groupCount;
+            tree1->groupCount = -1;
             return tree2;
         }
     }
@@ -149,17 +149,17 @@ class UnionFind
         if(tree1->groupCount >= tree2->groupCount)
         {
             tree2->father = make_shared<UpTreeNode>(tree1);
-            tree2->groupCount += tree1->groupCount;
-            tree1->groupCount = -1;
+            tree1->groupCount += tree2->groupCount;
+            tree2->groupCount = -1;
             tree2->semiHight = tree2->semihight + tree1->highFromGround() - tree1->semiHight;
             return tree1;
         }
         else
         {
             tree1->father = make_shared<UpTreeNode>(tree2);
-            tree1->groupCount += tree2->groupCount;
-            tree2->groupCount = -1;
-            tree2->semiHight = tree2->semihight + tree1->highFromGround
+            tree2->groupCount += tree1->groupCount;
+            tree1->groupCount = -1;
+            tree2->semiHight = tree2->semihight + tree1->highFromGround();
             tree1->semiHight = tree1->semiHight - tree2->semiHight;
             return tree2;
         }
@@ -168,14 +168,14 @@ class UnionFind
 
 
 
-
-    int UnionFind::highFromGround()
+ 
+    int UnionFind::highFromGround()//still need to ceack if adding thr the record copies is true!!!
     {
         auto nodeToRun = this->father;
         int hight = this->semiHight;
         while (nodeToRun != NULL)
         {
-            hight += nodeToRun->semiHight;
+            hight += nodeToRun->semiHight + nodeToRun->value->copies;
             auto currentFather = nodeToRun->father;
             nodeToRun->father = groupFather;
             nodeToRun = currenFather;
