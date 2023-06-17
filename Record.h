@@ -16,9 +16,9 @@ public:
     ~Record() = default;
 
     //Getters
-    const int get_r_id() const;
-    const int get_copies() const;
-    const int get_purchases() const;
+    int get_id() const;
+    int get_copies() const;
+    int get_purchases() const;
 
     //Setters
     void set_r_id(int id);

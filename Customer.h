@@ -17,9 +17,9 @@ public:
     ~Customer() = default;
 
     //Getters
-    const int get_c_id() const;
-    const int get_phone() const;
-    const bool get_isMember() const;
+    int get_id() const;
+    int get_phone() const;
+    bool get_isMember() const;
 
     //Setters
     StatusType set_club_member();

@@ -5,13 +5,13 @@ Record::Record(int id, int copies) : r_id(id), copies(copies), purchases(NO_PURC
 
 //--------------------------------------GETTERS/SETTERS------------------------------------------------------
 
-const int Record::get_r_id() const{
+int Record::get_id() const{
     return r_id;
 }
-const int Record::get_copies() const{
+int Record::get_copies() const{
     return copies;
 }
-const int Record::get_purchases() const{
+int Record::get_purchases() const{
     return purchases;
 }
 
@@ -28,13 +28,13 @@ void Record::raise_purchases(int count){
 //--------------------------------------OPERATOR OVERLOADING------------------------------------------------------
 
 bool operator>(const Record &record1, const Record &record2){
-    return (record1.get_r_id() > record2.get_r_id());
+    return (record1.get_id() > record2.get_id());
 }
 bool operator<(const Record& record1, const Record& record2){
-    return (record1.get_r_id() < record2.get_r_id());
+    return (record1.get_id() < record2.get_id());
 }
 bool operator==(const Record& record1, const Record& record2){
-    return (record1.get_r_id() == record2.get_r_id());
+    return (record1.get_id() == record2.get_id());
 }
 
 

@@ -2,12 +2,18 @@
 #define RECORDS_COMPANY_H
 
 #include "utilesWet2.h"
-
-
+#include "AVL.h"
+#include "Customer.h"
+#include "Record.h"
+#include "Hash.h"
 
 class RecordsCompany {
   private:
     // todo
+    int* records;
+    int* membersById;
+    TreeNode<std::shared_ptr<Customer>> clubMembers;
+
   public:
     RecordsCompany();
     ~RecordsCompany();
@@ -15,7 +21,7 @@ class RecordsCompany {
     /// @brief first, update the record id for all records and re-arrange records according to it.
     ///        second, upfate the amount of money each customer has to pay (if club member)
     /// @param records_stocks - array of records, holding number of copies of a record.
-    /// @param number_of_records - size of the array above (e.g. number of records the store is holding)
+    /// @param number_of_records - elements of the array above (e.g. number of records the store is holding)
     /// @param COMPLEXITY - O(n+m)
     /// @return INVALID_INPUT if number of records < 0
     ///         ALLOCATION_ERROR in case of problems with memory alloctions
