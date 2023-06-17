@@ -11,4 +11,4 @@ add_executable(wet2
         Record.cpp
         Record.h
         recordsCompany.h
-        utilesWet2.h recordsCompany.cpp Hash.h)
+        utilesWet2.h recordsCompany.cpp Hash.h UnionFind.h)

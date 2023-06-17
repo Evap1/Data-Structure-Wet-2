@@ -6,7 +6,7 @@
 #include "utilesWet2.h"
 #include <memory>
 #include "Record.h"
-#include "Hash_Table"
+#include "Hash.h"
 
 using namespace std;
 
@@ -58,9 +58,7 @@ class UnionFind
     UpTreeNode* find(shared_ptr<T> data);
     UpTreeNode* unionGroups(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2);
     int highFromGround();
-
 };
-
 
 
     UpTreeNode* UnionFind::makeSet(shared_ptr<T> data)
