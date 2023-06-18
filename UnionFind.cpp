@@ -14,8 +14,10 @@ shared_ptr<UpTreeNode> UnionFind::makeSet(shared_ptr<Record> data)
 
     if(arr.insert(toAdd) == StatusType::SUCCESS)
     {
-        toAdd->column = insertionIndex;
-        insertionIndex++;
+        // toAdd->column = insertionIndex;
+        // insertionIndex++;
+        // size++;
+        toAdd->column = size;
         size++;
         return toAdd;
     }
@@ -75,7 +77,7 @@ shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)
 
 shared_ptr<UpTreeNode> UnionFind::unionGroups(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2)
 {
-    if(tree1->groupCount >= tree2->groupCount)
+   if(tree1->groupCount >= tree2->groupCount)
     {
         //up tree node recive record as a parameter
         tree2->father = tree1;
@@ -133,10 +135,15 @@ shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree
         return tree2;
     }
 
+
 }
 
 
-
+/// @brief in use for the function getPlace.
+/// @param r_id record id
+/// @param column record's column
+/// @param hight record's hight from ground
+/// @return returns true if the function succeeded
 bool UnionFind::getPlace(int r_id, int *column, int *hight)
 {
     shared_ptr<UpTreeNode> recordNode = findNode(r_id);
