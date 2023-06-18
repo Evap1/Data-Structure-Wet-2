@@ -130,6 +130,21 @@ StatusType Hash<T>::insert(shared_ptr<T> element){
         return StatusType::ALREADY_EXISTS;
     }
 
+    if (buckets[h(id)] == NULL){
+        try{
+            buckets[h(id)] =  new LinkedNode<T>(element);
+            elements++;
+            // m * alpha = n while m is the arrSize and n is the elements
+            if (arrSize * ALPHA <= elements){
+                increaseSize();
+            }
+        } catch (...){
+            return StatusType::ALLOCATION_ERROR;
+        }
+        return StatusType::SUCCESS;
+    }
+
+    //other option
     LinkedNode<T>* bucket = buckets[h(id)];
     while (bucket->next != nullptr){
         bucket = bucket->next;

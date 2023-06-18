@@ -31,6 +31,10 @@ shared_ptr<Record> UnionFind::find(int dataId)
     return findNode(dataId)->value;
 }
 
+shared_ptr<Record> UnionFind::findSpecified(int dataId)
+{
+    return arr.find(dataId)->value;
+}
 
 
 shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)

@@ -4,6 +4,10 @@
 
 #include "recordsCompany.h"
 
+RecordsCompany::RecordsCompany()
+{
+    records = make_unique<UnionFind>();
+}
 
 StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records)
 {
@@ -28,11 +32,11 @@ StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records)
 void RecordsCompany::newMounthForUnionFind(int *records_stocks, int number_of_records)
 {
     records.reset();
-
+    records = make_unique<UnionFind>();
     for(int i = 0; i< number_of_records; i++)
     {
         // i will be the Record's ID
-        shared_ptr<Record> recordToAdd = make_shared<Record>(new Record(i,records_stocks[i]));
+        shared_ptr<Record> recordToAdd = make_shared<Record>(i,records_stocks[i]);
         records->makeSet(recordToAdd);
     }
 }
@@ -114,6 +118,7 @@ Output_t<bool> RecordsCompany::isMember(int c_id){
     return temp;
 }
 
+//HAS PROBLEM
 StatusType RecordsCompany::buyRecord(int c_id, int r_id){
     if (c_id < 0 || r_id < 0){
         return StatusType::INVALID_INPUT;
@@ -124,7 +129,7 @@ StatusType RecordsCompany::buyRecord(int c_id, int r_id){
         return StatusType::DOESNT_EXISTS;
     }
 
-    auto record = records->find(r_id);
+    auto record = records->findSpecified(r_id);
     // if the customer is a club member
     if (customer->get_isMember()){
         int expense = BASE_EXPENSE + record->get_purchases();

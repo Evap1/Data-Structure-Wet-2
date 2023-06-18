@@ -27,7 +27,7 @@ class RecordsCompany {
     void resetClubTree(Node<Customer> *root);
 
   public:
-    RecordsCompany() = default;
+    RecordsCompany();
     ~RecordsCompany() = default;
 
     /// @brief first, update the record id for all records and re-arrange records according to it.

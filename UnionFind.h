@@ -37,9 +37,7 @@ public:
 class UnionFind
 {
 private:
-    shared_ptr<UpTreeNode> root;
     Hash<UpTreeNode> arr;
-    int insertionIndex = 0;
     int size = 0;
 
 public:
@@ -55,13 +53,13 @@ public:
     int getSize() const;
 
     shared_ptr<Record> find(int dataId);
+    shared_ptr<Record> findSpecified(int dataId);
     shared_ptr<Record> union_PutOnTop(int r_id1, int r_id2);
     shared_ptr<UpTreeNode> union_PutOnTopNode(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2);
 
     bool getPlace(int r_id, int *column, int *hight);
 
     // UpTreeNode* find(int data);
-
 };
 
 
