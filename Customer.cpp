@@ -5,6 +5,9 @@
 
 Customer::Customer(int id, int phone) : c_id(id), phone(phone), isClubMember(false), expense(NO_EXPANSE){}
 
+Customer::Customer (int id) : c_id(id), phone(TEMP), isClubMember(false), expense(NO_EXPANSE){}
+
+
 //--------------------------------------GETTERS/SETTERS------------------------------------------------
 int Customer::get_id() const
 {

@@ -12,7 +12,7 @@ shared_ptr<UpTreeNode> UnionFind::makeSet(shared_ptr<Record> data)
 
     shared_ptr<UpTreeNode> toAdd = make_shared<UpTreeNode>(data);
 
-    if(arr.insert(toAdd) != NULL)
+    if(arr.insert(toAdd) == StatusType::SUCCESS)
     {
         toAdd->column = insertionIndex;
         insertionIndex++;
@@ -77,14 +77,15 @@ shared_ptr<UpTreeNode> UnionFind::unionGroups(shared_ptr<UpTreeNode> tree1, shar
 {
     if(tree1->groupCount >= tree2->groupCount)
     {
-        tree2->father = make_shared<UpTreeNode>(tree1);
+        //up tree node recive record as a parameter
+        tree2->father = tree1;
         tree1->groupCount += tree2->groupCount;
         tree2->groupCount = -1;
         return tree1;
     }
     else
     {
-        tree1->father = make_shared<UpTreeNode>(tree2);
+        tree1->father = tree2;
         tree2->groupCount += tree1->groupCount;
         tree1->groupCount = -1;
         return tree2;
@@ -116,7 +117,7 @@ shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree
 
     if(tree1->groupCount >= tree2->groupCount)
     {
-        tree2->father = make_shared<UpTreeNode>(tree1);
+        tree2->father = tree1;
         tree1->groupCount += tree2->groupCount;
         tree2->groupCount = -1;
         tree2->semiHight = tree2->semiHight + tree1->highFromGround() - tree1->semiHight;
@@ -124,7 +125,7 @@ shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree
     }
     else
     {
-        tree1->father = make_shared<UpTreeNode>(tree2);
+        tree1->father = tree2;
         tree2->groupCount += tree1->groupCount;
         tree1->groupCount = -1;
         tree2->semiHight = tree2->semiHight + tree1->highFromGround();

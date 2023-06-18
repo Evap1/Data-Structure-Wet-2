@@ -5,8 +5,9 @@
 #ifndef WET2_HASH_H
 #define WET2_HASH_H
 
-class Record;
-class Customer;
+#include <memory>
+using namespace std;
+
 // Linked List node
 template <class T>
 class LinkedNode {
@@ -15,7 +16,7 @@ public:
     LinkedNode* next;
 
     LinkedNode() = default;
-    explicit LinkedNode(shared_ptr<T> value) : value(make_shared<T>(value)) , next(nullptr){}
+    explicit LinkedNode(shared_ptr<T> value) : value(value) , next(nullptr){}
 };
 
 template <class T>

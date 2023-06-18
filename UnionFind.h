@@ -22,7 +22,7 @@ public:
     int semiHight;
     int column;
 
-    UpTreeNode(shared_ptr<Record> Value): groupCount(1), value(Value), father(NULL), semiHight(0), column(0){}
+    explicit UpTreeNode(shared_ptr<Record> Value): groupCount(1), value(Value), father(NULL), semiHight(0), column(0){}
     ~UpTreeNode() = default;
 
     int get_id() const {

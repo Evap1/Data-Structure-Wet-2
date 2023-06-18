@@ -3,11 +3,10 @@
 #define AVL_H
 
 #include<iostream>
-#include "../../../../../Downloads/utilesWet2.h"
+#include "utilesWet2.h"
 
 using namespace std;
 
-//TODO: test this whole thing
 //TODO: DELETE PRINT FUNCTIONS
 
 // Implementation later on
@@ -69,13 +68,13 @@ private:
     Node<T>*  balance_Tree(Node<T>* node);
 
     // additional methods
-    double getRankAux(Node<T>* v, int key);
+    double getRankAux(Node<T> *v, const T& value);
     Node<T>* insert(Node<T>* node, const T& value);
     Node<T>* remove(const T& value, Node<T> *v);
     Node<T>* find(Node<T>* v, const T &value) const;
     Node<T>* findMin(Node<T>* v) const;
     Node<T>* findMaxAux (Node<T>* v) const;
-    bool find_by_id(int value);
+    Node<T>* find_by_id(int value);
 
     //printing/listing
     void inorder(Node<T>* v);
@@ -90,7 +89,9 @@ public:
     int get_height();
     int get_counter();
     Node<T>* get_root();
-    double get_rank(Node<T>* v);
+    double get_rank(const T& value);
+
+
 
     // Additional
     StatusType insert(const T& value);
@@ -178,7 +179,6 @@ template <class T>
 void Node<T>::set_hight(int amount){
     height = amount;
 }
-
 
 // -----------------------------------------TREENODE CLASS---------------------------------------
 
@@ -552,14 +552,11 @@ Node<T> *TreeNode<T>::find(const T &value) const {
 /// @param value - to search
 /// @return - NULL if not found , the ptr to element if found.
 template<class T>
-bool TreeNode<T>::find_by_id(int value) {
+Node<T>* TreeNode<T>::find_by_id(int value) {
     T* temp = new T(value);
-    if (find(root,temp) == NULL) {
-        delete temp;
-        return false;
-    }
+    Node<T>* current = find(root, *temp);
     delete temp;
-    return true;
+    return current;
 }
 
 /// @brief Find max value IN THE WHOLE TREE and return it's node.
@@ -621,6 +618,31 @@ Node<T> *TreeNode<T>::get_root() {
     return root;
 }
 
+/// \tparam T
+/// \param key
+/// \return -1 incase the key does not exist
+template <class T>
+double TreeNode<T>::get_rank(const T& value)
+{
+    return getRankAux(root, value);
+}
+
+//user has to check v indeed exists
+template <class T>
+double TreeNode<T>::getRankAux(Node<T> *v, const T& value)
+{
+    if (v->key == value){
+        return v->get_rank();
+    }
+    if ( v->key < value){
+        double temp = getRankAux(v->right, value);
+        return v->get_rank() + temp;
+    }
+    else{
+        double temp = getRankAux(v->left, value);
+        return v->get_rank()+ temp;
+    }
+}
 
 // -----------------------------------------LISTING METHODS-----------------------------------------
 
@@ -689,6 +711,8 @@ void TreeNode<T>::inorder(Node<T> *v) {
     cout << v->key << " , ";
     inorder(v->right);
 }
+
+
 
 
 #endif //AVL_H

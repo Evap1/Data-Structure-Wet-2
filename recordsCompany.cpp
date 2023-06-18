@@ -50,7 +50,7 @@ StatusType RecordsCompany::makeMember(int c_id){
         return StatusType ::ALREADY_EXISTS;
     }
 
-    clubMembers.insert(customer);
+    return clubMembers.insert(*customer);
 }
 
 Output_t<bool> RecordsCompany::isMember(int c_id){
@@ -82,17 +82,19 @@ StatusType RecordsCompany::buyRecord(int c_id, int r_id){
     // if the customer is a club member
     if (customer->get_isMember()){
         int expense = BASE_EXPENSE + record->get_purchases();
-        customer->update_expense(expense);
+        Customer* temp = new Customer(c_id);
+        clubMembers.find(*temp)->get_key_by_ref()->update_expense(expense);
+        delete temp;
     }
     record->raise_purchases(1);
     return StatusType::SUCCESS;
 }
 
 // assuming c_id indeed exist
-void RecordsCompany::addAux(int c_id, double amount, Node<shared_ptr<Customer>>* start, bool wasRight){
+void RecordsCompany::addAux(int c_id, double amount, Node<Customer>* start, bool wasRight){
 
     // found the element
-    if (start->get_key()->get_id() == c_id){
+    if (start->get_key().get_id() == c_id){
         //we didnt add yet
         if (!wasRight){
             start->add_rank(amount);
@@ -105,7 +107,7 @@ void RecordsCompany::addAux(int c_id, double amount, Node<shared_ptr<Customer>>*
     }
 
     // need to search right
-    else if (start->get_key()->get_id() < c_id){
+    else if (start->get_key().get_id() < c_id){
         //update the field
         if (!wasRight){
             start->add_rank(amount);
@@ -114,15 +116,15 @@ void RecordsCompany::addAux(int c_id, double amount, Node<shared_ptr<Customer>>*
         auto rightSon = start->get_right_nonConst();
 
         //found the element
-        if (rightSon->get_key()->get_id() == c_id){
+        if (rightSon->get_key().get_id() == c_id){
             return addAux(c_id, amount, rightSon, true);
         }
         //go  -> right -> right
-        if (rightSon->get_key()->get_id() < c_id) {
+        if (rightSon->get_key().get_id() < c_id) {
             return addAux(c_id, amount, rightSon, true);
         }
         //go  -> right -> left
-        if (rightSon->get_key()->get_id() > c_id){
+        if (rightSon->get_key().get_id() > c_id){
             //update the root which is too big
             rightSon->add_rank((-1)*amount);
             //update the subtree which need the raise
@@ -132,17 +134,17 @@ void RecordsCompany::addAux(int c_id, double amount, Node<shared_ptr<Customer>>*
     }
 
     // need to search left
-    else if (start->get_key()->get_id() > c_id){
+    else if (start->get_key().get_id() > c_id){
         //go  -> left
         auto leftSon = start->get_left_nonConst();
 
         //found the needed value
-        if (leftSon->get_key()->get_id() == c_id) {
+        if (leftSon->get_key().get_id() == c_id) {
             return addAux(c_id, amount, leftSon, false);
         }
 
         //go -> left -> right
-        if (leftSon->get_key()->get_id() < c_id){
+        if (leftSon->get_key().get_id() < c_id){
             //update the field
             leftSon->add_rank(amount);
             //right subtree doesnt need, update it:
@@ -150,7 +152,7 @@ void RecordsCompany::addAux(int c_id, double amount, Node<shared_ptr<Customer>>*
             return addAux(c_id, amount, leftSon, true);
         }
         //go -> left -> left
-        else if (leftSon->get_key()->get_id() > c_id){
+        else if (leftSon->get_key().get_id() > c_id){
             return addAux(c_id, amount, leftSon, false);
         }
 
@@ -176,20 +178,20 @@ StatusType RecordsCompany::addPrize(int c_id1, int c_id2, double  amount){
     return StatusType::SUCCESS;
 }
 
-double RecordsCompany::sumRanks(int c_id,  Node<shared_ptr<Customer>>* current){
-
-    if (current->get_key()->get_id() == c_id){
-        return current->get_rank();
-    }
-    else if (current->get_key()->get_id() < c_id){
-        double temp = sumRanks(c_id, current->get_right_nonConst());
-        return current->get_rank() + temp;
-    }
-    else if (current->get_key()->get_id() > c_id){
-        double temp = sumRanks(c_id, current->get_left_nonConst());
-        return current->get_rank() + temp;
-    }
-}
+//double RecordsCompany::sumRanks(int c_id,  Node<shared_ptr<Customer>>* current){
+//
+//    if (current->get_key()->get_id() == c_id){
+//        return current->get_rank();
+//    }
+//    else if (current->get_key()->get_id() < c_id){
+//        double temp = sumRanks(c_id, current->get_right_nonConst());
+//        return current->get_rank() + temp;
+//    }
+//    else {
+//        double temp = sumRanks(c_id, current->get_left_nonConst());
+//        return current->get_rank() + temp;
+//    }
+//}
 
 Output_t<double> RecordsCompany::getExpenses(int c_id){
     if (c_id < 0 ){
@@ -201,11 +203,49 @@ Output_t<double> RecordsCompany::getExpenses(int c_id){
         return StatusType::DOESNT_EXISTS;
     }
 
-    double discount = sumRanks(c_id, clubMembers.get_root());
+    double discount = clubMembers.get_rank(*customer);
     double expense = customer->get_expense();
     auto temp = Output_t<double>(expense-discount);
     return temp;
 }
+
+
+StatusType RecordsCompany::putOnTop(int r_id1, int r_id2)
+{
+    if(r_id1 < 0 || r_id2 < 0)
+        return StatusType::INVALID_INPUT;
+
+    if(r_id1 >= records.getSize() || r_id2 >= records.getSize())
+        return StatusType::DOESNT_EXISTS;
+
+    shared_ptr<Record> record1 = records.find(r_id1);
+    shared_ptr<Record> record2 = records.find(r_id2);
+
+    if((record1 == NULL || record2 == NULL) || (*record1 == *record2))
+        return StatusType::FAILURE;
+
+    shared_ptr<Record> groupRecord = records.union_PutOnTop(r_id1, r_id2);
+    if(groupRecord == NULL)
+        return StatusType::FAILURE;
+
+    return StatusType::SUCCESS;
+}
+
+
+StatusType RecordsCompany::getPlace(int r_id, int *column, int *hight)
+{
+    if(r_id < 0)
+        return StatusType::INVALID_INPUT;
+
+    if(r_id >= records.getSize())
+        return StatusType::DOESNT_EXISTS;
+
+    bool flag = records.getPlace(r_id, column, hight);
+    if(flag)
+        return StatusType::SUCCESS;
+    return StatusType::FAILURE;
+}
+
 
 
 

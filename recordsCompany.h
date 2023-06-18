@@ -13,13 +13,12 @@ using namespace std;
 
 class RecordsCompany {
   private:
-    // todo
     Hash<Customer> customers;
     UnionFind records;
-    TreeNode<std::shared_ptr<Customer>> clubMembers;
+    TreeNode<Customer> clubMembers;
 
-    void addAux(int c_id, double amount, Node<shared_ptr<Customer>>* v, bool wasRight);
-    double sumRanks(int c_id,  Node<shared_ptr<Customer>>* current);
+    void addAux(int c_id, double amount, Node<Customer>* v, bool wasRight);
+    //double sumRanks(int c_id,  Node<shared_ptr<Customer>>* current);
     static const int BASE_EXPENSE = 100;
   public:
     RecordsCompany() = default;

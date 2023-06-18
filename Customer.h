@@ -10,10 +10,11 @@ private:
     bool isClubMember;
     double expense;
     static const int NO_EXPANSE = 0;
-
+    static const int TEMP = 0;
 public:
     // Construtor / Destructor
     Customer(int id, int phone);
+    explicit Customer (int id);
     ~Customer() = default;
 
     //Getters
