@@ -4,7 +4,6 @@
 //-----------------------------------CONSTRUCTOR/DESTRUCTOR------------------------------------------------
 
 Customer::Customer(int id, int phone) : c_id(id), phone(phone), isClubMember(false), expense(NO_EXPANSE){}
-
 Customer::Customer (int id) : c_id(id), phone(TEMP), isClubMember(false), expense(NO_EXPANSE){}
 
 
@@ -38,6 +37,12 @@ double Customer::get_expense() const
 void Customer::update_expense(double amount){
     expense+=amount;
 }
+
+void Customer::resetExpenses()
+{
+    expense = NO_EXPANSE;
+}
+
 
 //--------------------------------------OPERATOR OVERLOADING------------------------------------------------
 
