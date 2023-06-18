@@ -5,9 +5,55 @@
 #include "recordsCompany.h"
 
 
-StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records){
+StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records)
+{
+    if(number_of_records < 0)
+        return StatusType::INVALID_INPUT;
 
+    try
+    {
+        newMounthForUnionFind(records_stocks, number_of_records);
+        newMounth_resetClubTree();
+    }
+    catch(const std::exception& e)
+    {
+       // std::cerr << e.what() << '\n';
+       return StatusType::ALLOCATION_ERROR;
+    }
+
+    return StatusType::SUCCESS;
 }
+
+
+void RecordsCompany::newMounthForUnionFind(int *records_stocks, int number_of_records)
+{
+    records.reset();
+
+    for(int i = 0; i< number_of_records; i++)
+    {
+        // i will be the Record's ID
+        shared_ptr<Record> recordToAdd = make_shared<Record>(new Record(i,records_stocks[i]));
+        records->makeSet(recordToAdd);
+    }
+}
+
+
+void RecordsCompany::newMounth_resetClubTree()
+{
+    resetClubTree(clubMembers.get_root());
+}
+
+void RecordsCompany::resetClubTree(Node<Customer> *root)
+{
+    if( root == NULL)
+        return;
+    resetClubTree(root->get_right_nonConst());
+    resetClubTree(root->get_left_nonConst());
+    root->get_key_to_set().resetExpenses();
+}
+
+
+
 
 
 StatusType RecordsCompany::addCostumer(int c_id, int phone){
@@ -74,11 +120,11 @@ StatusType RecordsCompany::buyRecord(int c_id, int r_id){
     }
 
     auto customer = customers.find(c_id);
-    if (customer == NULL || r_id > records.getSize()){
+    if (customer == NULL || r_id > records->getSize()){
         return StatusType::DOESNT_EXISTS;
     }
 
-    auto record = records.find(r_id);
+    auto record = records->find(r_id);
     // if the customer is a club member
     if (customer->get_isMember()){
         int expense = BASE_EXPENSE + record->get_purchases();
@@ -159,6 +205,7 @@ void RecordsCompany::addAux(int c_id, double amount, Node<Customer>* start, bool
     }
 }
 
+
 // add to all until cid2-1 because we dont want to give to cid2 and reduce to all to cid1
 StatusType RecordsCompany::addPrize(int c_id1, int c_id2, double  amount){
     if (amount <= 0 || c_id1 < 0 || c_id2 < 0 ){
@@ -178,20 +225,20 @@ StatusType RecordsCompany::addPrize(int c_id1, int c_id2, double  amount){
     return StatusType::SUCCESS;
 }
 
-//double RecordsCompany::sumRanks(int c_id,  Node<shared_ptr<Customer>>* current){
-//
-//    if (current->get_key()->get_id() == c_id){
-//        return current->get_rank();
-//    }
-//    else if (current->get_key()->get_id() < c_id){
-//        double temp = sumRanks(c_id, current->get_right_nonConst());
-//        return current->get_rank() + temp;
-//    }
-//    else {
-//        double temp = sumRanks(c_id, current->get_left_nonConst());
-//        return current->get_rank() + temp;
-//    }
-//}
+// double RecordsCompany::sumRanks(int c_id,  Node<shared_ptr<Customer>>* current){
+
+//     if (current->get_key()->get_id() == c_id){
+//         return current->get_rank();
+//     }
+//     else if (current->get_key()->get_id() < c_id){
+//         double temp = sumRanks(c_id, current->get_right_nonConst());
+//         return current->get_rank() + temp;
+//     }
+//     else if (current->get_key()->get_id() > c_id){
+//         double temp = sumRanks(c_id, current->get_left_nonConst());
+//         return current->get_rank() + temp;
+//     }
+// }
 
 Output_t<double> RecordsCompany::getExpenses(int c_id){
     if (c_id < 0 ){
@@ -210,21 +257,22 @@ Output_t<double> RecordsCompany::getExpenses(int c_id){
 }
 
 
+
 StatusType RecordsCompany::putOnTop(int r_id1, int r_id2)
 {
     if(r_id1 < 0 || r_id2 < 0)
         return StatusType::INVALID_INPUT;
 
-    if(r_id1 >= records.getSize() || r_id2 >= records.getSize())
+    if(r_id1 >= records->getSize() || r_id2 >= records->getSize())
         return StatusType::DOESNT_EXISTS;
 
-    shared_ptr<Record> record1 = records.find(r_id1);
-    shared_ptr<Record> record2 = records.find(r_id2);
+    shared_ptr<Record> record1 = records->find(r_id1);
+    shared_ptr<Record> record2 = records->find(r_id2);
 
     if((record1 == NULL || record2 == NULL) || (*record1 == *record2))
         return StatusType::FAILURE;
 
-    shared_ptr<Record> groupRecord = records.union_PutOnTop(r_id1, r_id2);
+    shared_ptr<Record> groupRecord = records->union_PutOnTop(r_id1, r_id2);
     if(groupRecord == NULL)
         return StatusType::FAILURE;
 
@@ -237,14 +285,16 @@ StatusType RecordsCompany::getPlace(int r_id, int *column, int *hight)
     if(r_id < 0)
         return StatusType::INVALID_INPUT;
 
-    if(r_id >= records.getSize())
+    if(r_id >= records->getSize())
         return StatusType::DOESNT_EXISTS;
 
-    bool flag = records.getPlace(r_id, column, hight);
+    bool flag = records->getPlace(r_id, column, hight);
     if(flag)
         return StatusType::SUCCESS;
     return StatusType::FAILURE;
 }
+
+
 
 
 
