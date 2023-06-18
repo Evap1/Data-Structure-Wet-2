@@ -13,7 +13,7 @@ StatusType RecordsCompany::addCostumer(int c_id, int phone){
         return StatusType::ALREADY_EXISTS;
     }
 
-    Customer* toAdd = new Customer(c_id, phone);
+    auto toAdd = make_shared<Customer>(c_id, phone);
     return customers.insert(toAdd);
 }
 

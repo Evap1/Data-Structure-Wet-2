@@ -7,13 +7,15 @@
 #include "Record.h"
 #include "Hash.h"
 #include "UnionFind.h"
+#include <memory>
+
+using namespace std;
 
 class RecordsCompany {
   private:
     // todo
     Hash<Customer> customers;
     UnionFind<Record> records;
-    //Hash<Record> records;
     TreeNode<std::shared_ptr<Customer>> clubMembers;
 
     void addAux(int c_id1, double amount, Customer* v);

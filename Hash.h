@@ -11,11 +11,11 @@ class Customer;
 template <class T>
 class LinkedNode {
 public:
-    T* value;
+    shared_ptr<T> value;
     LinkedNode* next;
 
     LinkedNode() = default;
-    explicit LinkedNode(T* value) : value(value) , next(nullptr){}
+    explicit LinkedNode(shared_ptr<T> value) : value(value) , next(nullptr){}
 };
 
 template <class T>
@@ -38,8 +38,8 @@ public:
     Hash(const Hash&) = delete;
     Hash& operator=(const Hash&) = delete;
 
-    StatusType insert(T* element);
-    T* find (int id);
+    StatusType insert(shared_ptr<T> element);
+    shared_ptr<T> find (int id);
     int get_elements() {return elements;}
 };
 
@@ -85,6 +85,7 @@ int Hash<T>::h(int id) const
 
 template <class T>
 void Hash<T>::increaseSize(){
+    int beforeSize = arrSize;
     arrSize *= 2;
 
     LinkedNode<T>** newArr = new LinkedNode<T>*[arrSize];
@@ -94,7 +95,7 @@ void Hash<T>::increaseSize(){
 
     // now we sort buckets again
     LinkedNode<T>* toDelete, *temp, *current;
-    for (int i = 0; i < arrSize; i ++){
+    for (int i = 0; i < beforeSize; i ++){
         current = buckets[i];
 
         while (current != nullptr){
@@ -119,7 +120,7 @@ void Hash<T>::increaseSize(){
 //-----------------------------------------Public Methods--------------------------------------
 
 template <class T>
-StatusType Hash<T>::insert(T* element){
+StatusType Hash<T>::insert(shared_ptr<T> element){
     int id = element->get_id();
     if (find(id) != nullptr){
         return StatusType::ALREADY_EXISTS;
@@ -147,7 +148,7 @@ StatusType Hash<T>::insert(T* element){
 /// \param id
 /// \return nullptr if not found. else return the data of the node.
 template <class T>
-T* Hash<T>::find(int id){
+shared_ptr<T> Hash<T>::find(int id){
     LinkedNode<T>* bucket = buckets[h(id)];
     while (bucket->value->get_id() != id){
         if (bucket->next == nullptr){
