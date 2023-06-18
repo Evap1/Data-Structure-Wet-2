@@ -4,6 +4,12 @@
 
 #include "recordsCompany.h"
 
+
+StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records){
+
+}
+
+
 StatusType RecordsCompany::addCostumer(int c_id, int phone){
     if (c_id < 0 || phone < 0){
         return StatusType::INVALID_INPUT;
@@ -68,7 +74,7 @@ StatusType RecordsCompany::buyRecord(int c_id, int r_id){
     }
 
     auto customer = customers.find(c_id);
-    if (customer == NULL || r_id > records.get_elements()){
+    if (customer == NULL || r_id > records.getSize()){
         return StatusType::DOESNT_EXISTS;
     }
 
@@ -82,28 +88,108 @@ StatusType RecordsCompany::buyRecord(int c_id, int r_id){
     return StatusType::SUCCESS;
 }
 
-void RecordsCompany::addAux(int c_id, double amount, Customer* v){
+// assuming c_id indeed exist
+void RecordsCompany::addAux(int c_id, double amount, Node<shared_ptr<Customer>>* start, bool wasRight){
 
-    if (v == NULL) return NULL;
+    // found the element
+    if (start->get_key()->get_id() == c_id){
+        //we didnt add yet
+        if (!wasRight){
+            start->add_rank(amount);
 
-    if (v->get_id() == c_id){
-        return v;
+            // the right side is out of range
+            if (start->get_right()!= NULL){
+                start->get_right_nonConst()->add_rank((-1)*amount);
+            }
+        }
     }
-    else if (v->get_id() < c_id){
-        return addAux(v->get, value);
+
+    // need to search right
+    else if (start->get_key()->get_id() < c_id){
+        //update the field
+        if (!wasRight){
+            start->add_rank(amount);
+        }
+        //go  -> right
+        auto rightSon = start->get_right_nonConst();
+
+        //found the element
+        if (rightSon->get_key()->get_id() == c_id){
+            return addAux(c_id, amount, rightSon, true);
+        }
+        //go  -> right -> right
+        if (rightSon->get_key()->get_id() < c_id) {
+            return addAux(c_id, amount, rightSon, true);
+        }
+        //go  -> right -> left
+        if (rightSon->get_key()->get_id() > c_id){
+            //update the root which is too big
+            rightSon->add_rank((-1)*amount);
+            //update the subtree which need the raise
+            rightSon->get_left_nonConst()->add_rank(amount);
+            return addAux(c_id, amount, rightSon, true);
+        }
     }
-    else{
-        return addAux(v->left, value);
+
+    // need to search left
+    else if (start->get_key()->get_id() > c_id){
+        //go  -> left
+        auto leftSon = start->get_left_nonConst();
+
+        //found the needed value
+        if (leftSon->get_key()->get_id() == c_id) {
+            return addAux(c_id, amount, leftSon, false);
+        }
+
+        //go -> left -> right
+        if (leftSon->get_key()->get_id() < c_id){
+            //update the field
+            leftSon->add_rank(amount);
+            //right subtree doesnt need, update it:
+            leftSon->get_right_nonConst()->add_rank((-1)*amount);
+            return addAux(c_id, amount, leftSon, true);
+        }
+        //go -> left -> left
+        else if (leftSon->get_key()->get_id() > c_id){
+            return addAux(c_id, amount, leftSon, false);
+        }
+
     }
 }
 
-
-
+// add to all until cid2-1 because we dont want to give to cid2 and reduce to all to cid1
 StatusType RecordsCompany::addPrize(int c_id1, int c_id2, double  amount){
-    auto rootMembers = clubMembers.get_root();
+    if (amount <= 0 || c_id1 < 0 || c_id2 < 0 ){
+        return StatusType::INVALID_INPUT;
+    }
 
+    auto customer1 = customers.find(c_id1);
+    auto customer2 = customers.find(c_id2);
+
+    if (customer1 == NULL || customer2 == NULL){
+        return StatusType::DOESNT_EXISTS;
+    }
+
+    auto rootMembers = clubMembers.get_root();
+    addAux(c_id2 -1 ,amount, rootMembers, false);
+    addAux(c_id1, (-1)*amount, rootMembers, false);
+    return StatusType::SUCCESS;
 }
 
+double RecordsCompany::sumRanks(int c_id,  Node<shared_ptr<Customer>>* current){
+
+    if (current->get_key()->get_id() == c_id){
+        return current->get_rank();
+    }
+    else if (current->get_key()->get_id() < c_id){
+        double temp = sumRanks(c_id, current->get_right_nonConst());
+        return current->get_rank() + temp;
+    }
+    else if (current->get_key()->get_id() > c_id){
+        double temp = sumRanks(c_id, current->get_left_nonConst());
+        return current->get_rank() + temp;
+    }
+}
 
 Output_t<double> RecordsCompany::getExpenses(int c_id){
     if (c_id < 0 ){
@@ -114,11 +200,10 @@ Output_t<double> RecordsCompany::getExpenses(int c_id){
     if (customer == NULL){
         return StatusType::DOESNT_EXISTS;
     }
-    //change the find by id
-    Customer* current = clubMembers.find_by_id(c_id);
-    // chnage all this places for double
-    double expense = current->get_expense();
-    auto temp = Output_t<double>(expense);
+
+    double discount = sumRanks(c_id, clubMembers.get_root());
+    double expense = customer->get_expense();
+    auto temp = Output_t<double>(expense-discount);
     return temp;
 }
 

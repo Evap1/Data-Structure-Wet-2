@@ -15,14 +15,15 @@ class RecordsCompany {
   private:
     // todo
     Hash<Customer> customers;
-    UnionFind<Record> records;
+    UnionFind records;
     TreeNode<std::shared_ptr<Customer>> clubMembers;
 
-    void addAux(int c_id1, double amount, Customer* v);
+    void addAux(int c_id, double amount, Node<shared_ptr<Customer>>* v, bool wasRight);
+    double sumRanks(int c_id,  Node<shared_ptr<Customer>>* current);
     static const int BASE_EXPENSE = 100;
   public:
-    RecordsCompany();
-    ~RecordsCompany();
+    RecordsCompany() = default;
+    ~RecordsCompany() = default;
 
     /// @brief first, update the record id for all records and re-arrange records according to it.
     ///        second, upfate the amount of money each customer has to pay (if club member)

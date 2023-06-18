@@ -8,7 +8,7 @@ private:
     int c_id;
     int phone;
     bool isClubMember;
-    int expense;
+    double expense;
     static const int NO_EXPANSE = 0;
 
 public:
@@ -20,11 +20,11 @@ public:
     int get_id() const;
     int get_phone() const;
     bool get_isMember() const;
-    int get_expense() const;
+    double get_expense() const;
 
     //Setters
     StatusType set_club_member();
-    void update_expense(int amount);
+    void update_expense(double amount);
 
 };
 

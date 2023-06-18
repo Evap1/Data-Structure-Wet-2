@@ -15,7 +15,7 @@ public:
     LinkedNode* next;
 
     LinkedNode() = default;
-    explicit LinkedNode(shared_ptr<T> value) : value(value) , next(nullptr){}
+    explicit LinkedNode(shared_ptr<T> value) : value(make_shared<T>(value)) , next(nullptr){}
 };
 
 template <class T>
@@ -65,7 +65,7 @@ Hash<T>::~Hash()
             current = buckets[i];
             while (current != nullptr)
             {
-                delete current->value;
+                //delete current->value;
                 toDelete = current;
                 current = current->next;
                 delete toDelete;
@@ -141,7 +141,7 @@ StatusType Hash<T>::insert(shared_ptr<T> element){
     } catch (...){
         return StatusType::ALLOCATION_ERROR;
     }
-    return StatusType ::SUCCESS;
+    return StatusType::SUCCESS;
 }
 
 /// \tparam T
@@ -150,6 +150,9 @@ StatusType Hash<T>::insert(shared_ptr<T> element){
 template <class T>
 shared_ptr<T> Hash<T>::find(int id){
     LinkedNode<T>* bucket = buckets[h(id)];
+    if (bucket == NULL){
+        return nullptr;
+    }
     while (bucket->value->get_id() != id){
         if (bucket->next == nullptr){
             return nullptr;

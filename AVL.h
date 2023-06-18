@@ -37,16 +37,16 @@ public:
     const Node<T>* get_right();
 
     int get_hight() const;
-    int get_rank() const;
-    void set_rank(int amount);
+    double get_rank() const;
+    void add_rank(double amount);
     void set_hight(int amount);
 
 private:
     T key;
     Node<T>* left;
     Node<T>* right;
-    int height{};
-    int rank{};
+    int height;
+    double rank;
 };
 
 // AVL Tree
@@ -69,7 +69,7 @@ private:
     Node<T>*  balance_Tree(Node<T>* node);
 
     // additional methods
-    int getRankAux(Node<T>* v, int key);
+    double getRankAux(Node<T>* v, int key);
     Node<T>* insert(Node<T>* node, const T& value);
     Node<T>* remove(const T& value, Node<T> *v);
     Node<T>* find(Node<T>* v, const T &value) const;
@@ -86,12 +86,11 @@ public:
     TreeNode();
     ~TreeNode();
     void delete_tree(Node<T>* v);
-
     // Getters
     int get_height();
     int get_counter();
     Node<T>* get_root();
-    int get_rank(Node<T>* v);
+    double get_rank(Node<T>* v);
 
     // Additional
     StatusType insert(const T& value);
@@ -167,12 +166,12 @@ int Node<T>::get_hight() const {
 }
 
 template <class T>
-int Node<T>::get_rank() const{
+double Node<T>::get_rank() const{
     return rank;
 }
 template <class T>
-void Node<T>::set_rank(int amount){
-    rank = amount;
+void Node<T>::add_rank(double amount){
+    rank += amount;
 }
 
 template <class T>
@@ -620,35 +619,6 @@ int TreeNode<T>::get_counter() {
 template<class T>
 Node<T> *TreeNode<T>::get_root() {
     return root;
-}
-
-/// \tparam T
-/// \param key
-/// \return -1 incase the key does not exist
-template <class T>
-int TreeNode<T>::get_rank(Node<T>* v)
-{
-    if (find(v)!= NULL){
-        return getRankAux(root, v);
-    }
-    return -1;
-}
-
-//user has to check v indeed exists
-template <class T>
-int TreeNode<T>::getRankAux(Node<T> *v, int key)
-{
-    if (v->key == key){
-        return v->get_rank();
-    }
-    if ( v->key < key){
-        int temp = getRankAux(v->right, key);
-        return v->get_rank() + temp;
-    }
-    else if (v->key > key){
-        int temp = getRankAux(v->left, key);
-        return v->get_rank()+ temp;
-    }
 }
 
 
