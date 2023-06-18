@@ -26,6 +26,12 @@ StatusType Customer::set_club_member(){
     return StatusType::SUCCESS;
 }
 
+int Customer::get_expense() const
+{
+    return expense;
+}
+
+/// \param amount adds the amount to the current value
 void Customer::update_expense(int amount){
     expense+=amount;
 }

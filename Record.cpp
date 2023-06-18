@@ -21,6 +21,8 @@ void Record::set_r_id(int id){
 void Record::set_copies(int count){
     copies=count;
 }
+
+/// \param count add the count to the already gained purchases
 void Record::raise_purchases(int count){
     purchases += count;
 }

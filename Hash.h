@@ -11,7 +11,7 @@ class Customer;
 template <class T>
 class LinkedNode {
 public:
-    T value;
+    T* value;
     LinkedNode* next;
 
     LinkedNode() = default;
@@ -38,9 +38,9 @@ public:
     Hash(const Hash&) = delete;
     Hash& operator=(const Hash&) = delete;
 
-    StatusType insert(const T& element);
-    T find (int id);
-
+    StatusType insert(T* element);
+    T* find (int id);
+    int get_elements() {return elements;}
 };
 
 //-----------------------------------------Constructor/ Destructor--------------------------------------
@@ -53,7 +53,7 @@ Hash<T>::Hash() : elements(0), arrSize(STARTING_SIZE), buckets(new LinkedNode<T>
         buckets[i] = nullptr;
     }
 }
-
+// do i need to delete T?
 template <class T>
 Hash<T>::~Hash()
 {
@@ -87,7 +87,7 @@ template <class T>
 void Hash<T>::increaseSize(){
     arrSize *= 2;
 
-    Node<T>** newArr = new LinkedNode<T>*[arrSize];
+    LinkedNode<T>** newArr = new LinkedNode<T>*[arrSize];
     for (int i = 0; i < arrSize; i ++){
         newArr[i] = nullptr;
     }
@@ -111,15 +111,15 @@ void Hash<T>::increaseSize(){
         }
     }
     //preserve the old arr for deleting memory
-    toDelete = buckets;
+    LinkedNode<T>** trash = buckets;
     buckets = newArr;
-    delete[] toDelete;
+    delete[] trash;
 }
 
 //-----------------------------------------Public Methods--------------------------------------
 
 template <class T>
-StatusType Hash<T>::insert(const T& element){
+StatusType Hash<T>::insert(T* element){
     int id = element->get_id();
     if (find(id) != nullptr){
         return StatusType::ALREADY_EXISTS;
@@ -129,12 +129,16 @@ StatusType Hash<T>::insert(const T& element){
     while (bucket->next != nullptr){
         bucket = bucket->next;
     }
-    LinkedNode<T>* toInsert = new LinkedNode<T>(element);
-    bucket->next = toInsert;
-    elements++;
-    // m * alpha = n while m is the arrSize and n is the elements
-    if (arrSize * ALPHA <= elements){
-        increaseSize();
+    try{
+        LinkedNode<T>* toInsert = new LinkedNode<T>(element);
+        bucket->next = toInsert;
+        elements++;
+        // m * alpha = n while m is the arrSize and n is the elements
+        if (arrSize * ALPHA <= elements){
+            increaseSize();
+        }
+    } catch (...){
+        return StatusType::ALLOCATION_ERROR;
     }
     return StatusType ::SUCCESS;
 }
@@ -143,7 +147,7 @@ StatusType Hash<T>::insert(const T& element){
 /// \param id
 /// \return nullptr if not found. else return the data of the node.
 template <class T>
-T Hash<T>::find(int id){
+T* Hash<T>::find(int id){
     LinkedNode<T>* bucket = buckets[h(id)];
     while (bucket->value->get_id() != id){
         if (bucket->next == nullptr){

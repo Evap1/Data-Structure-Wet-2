@@ -6,14 +6,18 @@
 #include "Customer.h"
 #include "Record.h"
 #include "Hash.h"
+#include "UnionFind.h"
 
 class RecordsCompany {
   private:
     // todo
-    int* records;
-    int* membersById;
+    Hash<Customer> customers;
+    UnionFind<Record> records;
+    //Hash<Record> records;
     TreeNode<std::shared_ptr<Customer>> clubMembers;
 
+    void addAux(int c_id1, double amount, Customer* v);
+    static const int BASE_EXPENSE = 100;
   public:
     RecordsCompany();
     ~RecordsCompany();

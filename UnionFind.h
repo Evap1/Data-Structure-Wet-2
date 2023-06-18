@@ -16,8 +16,7 @@ using namespace std;
 template <class T>
 class UpTreeNode
 {
-
-    private:
+public:
     int groupCount;
     shared_ptr<T> value;
     shared_ptr<UpTreeNode> father;
@@ -26,11 +25,11 @@ class UpTreeNode
     int semiHight;
     int column;
 
-    public:
-    
     UpTreeNode(shared_ptr<T> Value): groupCount(1), value(Value), father(NULL), semiHight(0), column(0){}
     ~UpTreeNode() = default;
-
+    int get_id() {
+        return value->get_id();
+    }
 
 
 };
@@ -41,27 +40,29 @@ class UnionFind
 {
 
     private:
-    shared_ptr<UpTreeNode> root;
-    Hash_Table<shared_ptr<UpTreeNode>> arr;
+    shared_ptr<UpTreeNode<T>> root;
+    Hash<UpTreeNode<T>> arr;
 
     int insertionIndex = 0;
 
     public:
 
-    friend class UpTreeNode;
+    friend class UpTreeNode<T>;
 
 
     UnionFind() = default;
     ~UnionFind() = default;
 
-    UpTreeNode* makeSet(shared_ptr<T> data);
-    UpTreeNode* find(shared_ptr<T> data);
-    UpTreeNode* unionGroups(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2);
+    UpTreeNode<T>* makeSet(shared_ptr<T> data);
+    UpTreeNode<T>* find(shared_ptr<T> data);
+    UpTreeNode<T>* unionGroups(shared_ptr<UpTreeNode<T>> tree1, shared_ptr<UpTreeNode<T>> tree2);
     int highFromGround();
+
+    UpTreeNode<T> *union_PutOnTop(shared_ptr<UpTreeNode<Record>> tree1, shared_ptr<UpTreeNode<Record>> tree2);
 };
 
-
-    UpTreeNode* UnionFind::makeSet(shared_ptr<T> data)
+template <class T>
+    UpTreeNode<T>* UnionFind<T>::makeSet(shared_ptr<T> data)
     {
         if(arr.find(*data) != NULL)
                 return NULL;
@@ -75,7 +76,8 @@ class UnionFind
         return NULL;
     }
 
-    UpTreeNode* UnionFind::find(shared_ptr<T> data)
+template <class T>
+UpTreeNode<T>* UnionFind<T>::find(shared_ptr<T> data)
     {
         auto node = arr.find(*data);
         if(node != NULL)
@@ -98,7 +100,7 @@ class UnionFind
 
         int tempR = 0;
         // runs up to the root and change the fathers to point on the group's root
-        auto nodeToRun = node;
+        nodeToRun = node;
         while (nodeToRun->father != NULL)
         {
             // used for calculating the hight from ground:
@@ -110,7 +112,7 @@ class UnionFind
 
             auto currentFather = nodeToRun->father;
             nodeToRun->father = groupFather;
-            nodeToRun = currenFather;
+            nodeToRun = currentFather;
         }
         
         return groupFather;
@@ -118,8 +120,9 @@ class UnionFind
 
 
 
-    
-    UpTreeNode* UnionFind::unionGroups(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2)
+
+template <class T>
+UpTreeNode<T>* UnionFind<T>::unionGroups(shared_ptr<UpTreeNode<T>> tree1, shared_ptr<UpTreeNode<T>> tree2)
     {
         if(tree1->groupCount >= tree2->groupCount)
         {
@@ -137,27 +140,29 @@ class UnionFind
         }
     }
 
+    // TODO: high from groud for up three node
     /// @brief 
     /// @param tree1 root of the first record group
     /// @param tree2 root of the second record group
     /// @return 
-    UpTreeNode<Record>* UnionFind::union_PutOnTop(shared_ptr<UpTreeNode<Record>> tree1, shared_ptr<UpTreeNode<Record>> tree2)
+    template <class T>
+    UpTreeNode<T>* UnionFind<T>::union_PutOnTop(shared_ptr<UpTreeNode<Record>> tree1, shared_ptr<UpTreeNode<Record>> tree2)
     {
         
         if(tree1->groupCount >= tree2->groupCount)
         {
-            tree2->father = make_shared<UpTreeNode>(tree1);
+            tree2->father = make_shared<UpTreeNode<T>>(tree1);
             tree1->groupCount += tree2->groupCount;
             tree2->groupCount = -1;
-            tree2->semiHight = tree2->semihight + tree1->highFromGround() - tree1->semiHight;
+            tree2->semiHight = tree2->semiHight + tree1->highFromGround() - tree1->semiHight;
             return tree1;
         }
         else
         {
-            tree1->father = make_shared<UpTreeNode>(tree2);
+            tree1->father = make_shared<UpTreeNode<T>>(tree2);
             tree2->groupCount += tree1->groupCount;
             tree1->groupCount = -1;
-            tree2->semiHight = tree2->semihight + tree1->highFromGround();
+            tree2->semiHight = tree2->semiHight + tree1->highFromGround();
             tree1->semiHight = tree1->semiHight - tree2->semiHight;
             return tree2;
         }
@@ -166,8 +171,8 @@ class UnionFind
 
 
 
- 
-    int UnionFind::highFromGround()//still need to ceack if adding thr the record copies is true!!!
+ template <class T>
+    int UnionFind<T>::highFromGround()//still need to ceack if adding thr the record copies is true!!!
     {
         auto nodeToRun = this->father;
         int hight = this->semiHight;
@@ -176,7 +181,7 @@ class UnionFind
             hight += nodeToRun->semiHight + nodeToRun->value->copies;
             auto currentFather = nodeToRun->father;
             nodeToRun->father = groupFather;
-            nodeToRun = currenFather;
+            nodeToRun = currentFather;
         } 
         return hight;
     }

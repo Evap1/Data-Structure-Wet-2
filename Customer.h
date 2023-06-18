@@ -20,6 +20,7 @@ public:
     int get_id() const;
     int get_phone() const;
     bool get_isMember() const;
+    int get_expense() const;
 
     //Setters
     StatusType set_club_member();
