@@ -2,12 +2,15 @@
 // Created by Eva Poluliakhov on 16/06/2023.
 //
 
+
 #ifndef WET2_HASH_H
 #define WET2_HASH_H
 
 #include <memory>
 using namespace std;
 
+class Record;
+class Customer;
 // Linked List node
 template <class T>
 class LinkedNode {
