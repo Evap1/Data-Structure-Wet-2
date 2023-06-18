@@ -91,8 +91,6 @@ public:
     Node<T>* get_root();
     double get_rank(const T& value);
 
-
-
     // Additional
     StatusType insert(const T& value);
     StatusType remove(const T& value);
@@ -179,6 +177,7 @@ template <class T>
 void Node<T>::set_hight(int amount){
     height = amount;
 }
+
 
 // -----------------------------------------TREENODE CLASS---------------------------------------
 
@@ -618,6 +617,8 @@ Node<T> *TreeNode<T>::get_root() {
     return root;
 }
 
+
+
 /// \tparam T
 /// \param key
 /// \return -1 incase the key does not exist
@@ -643,6 +644,7 @@ double TreeNode<T>::getRankAux(Node<T> *v, const T& value)
         return v->get_rank()+ temp;
     }
 }
+
 
 // -----------------------------------------LISTING METHODS-----------------------------------------
 
@@ -711,8 +713,6 @@ void TreeNode<T>::inorder(Node<T> *v) {
     cout << v->key << " , ";
     inorder(v->right);
 }
-
-
 
 
 #endif //AVL_H
