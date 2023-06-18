@@ -11,6 +11,7 @@ private:
     double expense;
     static const int NO_EXPANSE = 0;
     static const int TEMP = 0;
+
 public:
     // Construtor / Destructor
     Customer(int id, int phone);
@@ -26,6 +27,7 @@ public:
     //Setters
     StatusType set_club_member();
     void update_expense(double amount);
+    void resetExpenses();
 
 };
 
