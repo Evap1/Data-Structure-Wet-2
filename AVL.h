@@ -72,8 +72,11 @@ private:
     Node<T>* insert(Node<T>* node, const T& value);
     Node<T>* remove(const T& value, Node<T> *v);
     Node<T>* find(Node<T>* v, const T &value) const;
-    Node<T>* findMin(Node<T>* v) const;
+    Node<T>* findMinAux(Node<T>* v) const;
     Node<T>* findMaxAux (Node<T>* v) const;
+    Node<T>* findClosestMinAux(Node<T> *current, Node<T> *max, const T& value) const;
+    Node<T>* findClosestMaxAux(Node<T> *current, Node<T> *min, const T& value) const;
+
     Node<T>* find_by_id(int value);
 
     //printing/listing
@@ -97,8 +100,13 @@ public:
     StatusType delete_tree();
     Node<T>* find(const T& value) const;
     Node<T>* findMax () const;
+    Node<T>* findMin() const;
+    Node<T>* findClosestMax(const T& value) const ;
+    Node<T>* findClosestMin(const T& value) const ;
 
-    // Printing/listing
+
+
+        // Printing/listing
     void list_inorder(Node<T>** arr);
     void print_tree();
     void printBT(const TreeNode& tree);
@@ -587,7 +595,16 @@ Node<T>* TreeNode<T>::findMaxAux(Node<T> *v) const{
 /// @param v
 /// @return min node in the subtrees of v
 template<class T>
-Node<T>* TreeNode<T>::findMin(Node<T> *v) const{
+Node<T>* TreeNode<T>::findMin() const{
+    return findMinAux(root);
+}
+
+/// @brief Find min value and return it's node.
+/// @tparam T
+/// @param v
+/// @return min node in the subtrees of v
+template<class T>
+Node<T>* TreeNode<T>::findMinAux(Node<T> *v) const{
     if ( v == NULL){
         return NULL;
     }
@@ -596,7 +613,56 @@ Node<T>* TreeNode<T>::findMin(Node<T> *v) const{
         return v;
     }
         //min will be found on subtree on the left only
-    else return findMin(v->left);
+    else return findMinAux(v->left);
+}
+
+template<class T>
+Node<T>* TreeNode<T>::findClosestMin(const T& value) const {
+    return findClosestMinAux(root, root, value);
+}
+
+
+// assuming we didnt find the needed value so we are looking for the closest from above
+template<class T>
+Node<T>* TreeNode<T>::findClosestMinAux(Node<T> *current, Node<T> *max, const T& value) const{
+    if (current == NULL) return max;
+
+    //we are still greater then needed, do left to search search smaller
+    else if (current->key > value){
+        return findClosestMinAux(current->left, current, value);
+    }
+        //if(current->key > value )
+    else {
+        //we can search smaller but it's already greater
+        if (current->right != NULL && current->right->key > value){
+            return max;
+        }
+        return findClosestMinAux(current->right, current, value);
+    }
+}
+
+template<class T>
+Node<T>* TreeNode<T>::findClosestMax(const T& value) const {
+    return findClosestMaxAux(root, root, value);
+}
+
+
+template<class T>
+Node<T>* TreeNode<T>::findClosestMaxAux(Node<T> *current, Node<T> *min, const T& value) const {
+    if (current == NULL) return min;
+
+    //we are still smallet then needed, do right to search greateer
+    else if (current->key < value){
+        return findClosestMaxAux(current->right, current, value);
+    }
+    //if(current->key > value )
+    else {
+        //we can search smaller but it's already greater
+        if (current->left != NULL && current->left->key > value){
+            return min;
+        }
+        return findClosestMaxAux(current->left, current, value);
+    }
 }
 
 

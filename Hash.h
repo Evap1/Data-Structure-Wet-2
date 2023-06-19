@@ -45,6 +45,8 @@ public:
     StatusType insert(shared_ptr<T> element);
     shared_ptr<T> find (int id);
     int get_elements() {return elements;}
+    int get_size() {return arrSize;}
+    LinkedNode<T>** get_buckets() {return buckets;}
 };
 
 //-----------------------------------------Constructor/ Destructor--------------------------------------
@@ -180,5 +182,7 @@ shared_ptr<T> Hash<T>::find(int id){
     }
     return bucket->value;
 }
+
+
 
 #endif //WET2_HASH_H

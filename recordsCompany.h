@@ -25,6 +25,7 @@ class RecordsCompany {
     void newMounthForUnionFind(int *records_stocks, int number_of_records);
     void newMounth_resetClubTree();
     void resetClubTree(Node<Customer> *root);
+    void reset_expense(int arrSize, LinkedNode<Customer>** buckets);
 
   public:
     RecordsCompany();
