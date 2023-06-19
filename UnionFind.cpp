@@ -28,19 +28,27 @@ shared_ptr<UpTreeNode> UnionFind::makeSet(shared_ptr<Record> data)
 
 shared_ptr<Record> UnionFind::find(int dataId)
 {
-    return findNode(dataId)->value;
+    shared_ptr<UpTreeNode> node = findNode(dataId);
+    if (node != NULL){
+        return node->value;
+    }
+    return NULL;
 }
 
 shared_ptr<Record> UnionFind::findSpecified(int dataId)
 {
-    return arr.find(dataId)->value;
+    shared_ptr<UpTreeNode> node = arr.find(dataId);
+    if (node != NULL){
+        return node->value;
+    }
+    return NULL;
 }
 
 
 shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)
 {
     shared_ptr<UpTreeNode> node = arr.find(dataId);
-    if(node != NULL)
+    if(node == NULL)
         return NULL;
 
     int sumR = 0;
@@ -126,7 +134,9 @@ shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree
         tree2->father = tree1;
         tree1->groupCount += tree2->groupCount;
         tree2->groupCount = -1;
-        tree2->semiHight = tree2->semiHight + tree1->highFromGround() - tree1->semiHight;
+        // semi hight is r funtion
+        tree2->semiHight = tree2->semiHight + tree1->highFromGround() - tree1->semiHight ;
+        tree1->column = tree2->column;
         return tree1;
     }
     else
@@ -135,7 +145,8 @@ shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree
         tree2->groupCount += tree1->groupCount;
         tree1->groupCount = -1;
         tree2->semiHight = tree2->semiHight + tree1->highFromGround();
-        tree1->semiHight = tree1->semiHight - tree2->semiHight;
+        tree1->semiHight = tree1->semiHight - tree2->semiHight ;
+        tree1->column = tree2->column;
         return tree2;
     }
 
@@ -160,16 +171,10 @@ bool UnionFind::getPlace(int r_id, int *column, int *hight)
 }
 
 
-
-
-
-
 int UnionFind::getSize() const
 {
     return size;
 }
-
-
 
 
 //_______________________________________UpTreeNode Functions______________________________________________

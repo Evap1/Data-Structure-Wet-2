@@ -25,7 +25,7 @@ public:
     double get_expense() const;
 
     //Setters
-    StatusType set_club_member();
+    void set_club_member();
     void update_expense(double amount);
     void resetExpenses();
 

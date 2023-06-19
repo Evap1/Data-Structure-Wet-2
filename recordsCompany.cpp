@@ -113,7 +113,7 @@ StatusType RecordsCompany::makeMember(int c_id){
     if (customer->get_isMember()){
         return StatusType ::ALREADY_EXISTS;
     }
-
+    customer->set_club_member();
     return clubMembers.insert(*customer);
 }
 

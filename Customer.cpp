@@ -23,9 +23,8 @@ bool Customer::get_isMember() const
     return isClubMember;
 } 
 
-StatusType Customer::set_club_member(){
+void Customer::set_club_member(){
     isClubMember=true;
-    return StatusType::SUCCESS;
 }
 
 double Customer::get_expense() const
