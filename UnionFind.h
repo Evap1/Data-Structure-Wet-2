@@ -1,5 +1,3 @@
-
-
 #ifndef WET2_UNIONFIND_H
 #define WET2_UNIONFIND_H
 
@@ -54,8 +52,9 @@ public:
 
     shared_ptr<Record> find(int dataId);
     shared_ptr<Record> findSpecified(int dataId);
+    shared_ptr<UpTreeNode> findSpecifiedNode(int dataId);
     shared_ptr<Record> union_PutOnTop(int r_id1, int r_id2);
-    shared_ptr<UpTreeNode> union_PutOnTopNode(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2);
+    shared_ptr<UpTreeNode> union_PutOnTopNode(shared_ptr<UpTreeNode> treeB, shared_ptr<UpTreeNode> treeA);
 
     bool getPlace(int r_id, int *column, int *hight);
 

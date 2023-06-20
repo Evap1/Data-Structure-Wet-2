@@ -661,7 +661,7 @@ Node<T>* TreeNode<T>::findClosestMaxAux(Node<T> *current, Node<T> *min, const T&
         if (current->left != NULL && current->left->key > value){
             return min;
         }
-        return findClosestMaxAux(current->left, current, value);
+        return findClosestMaxAux(current->left, min, value);
     }
 }
 

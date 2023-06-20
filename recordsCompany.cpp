@@ -6,7 +6,7 @@
 
 RecordsCompany::RecordsCompany()
 {
-    records = make_unique<UnionFind>();
+    records = unique_ptr<UnionFind>(new UnionFind());
 }
 
 StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records)
@@ -33,7 +33,7 @@ StatusType RecordsCompany::newMonth(int *records_stocks, int number_of_records)
 void RecordsCompany::newMounthForUnionFind(int *records_stocks, int number_of_records)
 {
     records.reset();
-    records = make_unique<UnionFind>();
+    records = unique_ptr<UnionFind>(new UnionFind());
     for(int i = 0; i< number_of_records; i++)
     {
         // i will be the Record's ID
@@ -137,22 +137,21 @@ StatusType RecordsCompany::buyRecord(int c_id, int r_id){
     if (c_id < 0 || r_id < 0){
         return StatusType::INVALID_INPUT;
     }
-
-    auto customer = customers.find(c_id);
-    if (customer == NULL || r_id > records->getSize()){
+    auto temp = customers.find(c_id);
+    if ( temp == NULL || r_id > records->getSize()){
         return StatusType::DOESNT_EXISTS;
     }
 
+    Customer* search = new Customer(c_id);
+    auto customer = clubMembers.find(*search);
+    delete search;
     auto record = records->findSpecified(r_id);
-    // if the customer is a club member
-    int expense = BASE_EXPENSE + record->get_purchases();
-    if (customer->get_isMember()){
-        Customer* temp = new Customer(c_id);
-        clubMembers.find(*temp)->get_key_by_ref()->update_expense(expense);
-        delete temp;
-    }
-    customer->update_expense(expense);
     record->raise_purchases(1);
+    int expense = BASE_EXPENSE + record->get_purchases();
+
+    if (customer != NULL ){
+        customer->get_key_by_ref()->update_expense(expense);
+    }
     return StatusType::SUCCESS;
 }
 
@@ -227,7 +226,7 @@ void RecordsCompany::addAux(int c_id, double amount, Node<Customer>* start, bool
 
 // add to all until cid2-1 because we dont want to give to cid2 and reduce to all to cid1
 StatusType RecordsCompany::addPrize(int c_id1, int c_id2, double  amount){
-    if (amount <= 0 || c_id1 < 0 || c_id2 < 0 ){
+    if (amount <= 0 || c_id1 < 0 || c_id2 < 0 || c_id2 < c_id1 ){
         return StatusType::INVALID_INPUT;
     }
 
@@ -249,12 +248,16 @@ StatusType RecordsCompany::addPrize(int c_id1, int c_id2, double  amount){
     auto closestMinCustomer = clubMembers.findClosestMin(*tempMin);
     delete tempMin;
     delete tempMax;
+    if (closestMaxCustomer == NULL || closestMinCustomer == NULL){
+        return StatusType::DOESNT_EXISTS;
+    }
     int max = closestMaxCustomer->get_key().get_id();
     int min = closestMinCustomer->get_key().get_id();
     auto rootMembers = clubMembers.get_root();
-
-    addAux( max ,amount, rootMembers, false);
-    addAux( min , (-1)*amount, rootMembers, false);
+    if (max <= c_id2 - 1 || min >= c_id1){
+        addAux( max ,amount, rootMembers, false);
+        addAux( min , (-1)*amount, rootMembers, false);
+    }
     return StatusType::SUCCESS;
 }
 
@@ -278,15 +281,14 @@ Output_t<double> RecordsCompany::getExpenses(int c_id){
         return StatusType::INVALID_INPUT;
     }
 
-    auto customer = customers.find(c_id);
+    Customer* search = new Customer(c_id);
+    auto customer = clubMembers.find(*search);
+    delete search;
     if (customer == NULL){
         return StatusType::DOESNT_EXISTS;
     }
-    double discount = 0;
-    if (customer->get_isMember()){
-        discount = clubMembers.get_rank(*customer);
-    }
-    double expense = customer->get_expense();
+    double discount = clubMembers.get_rank(customer->get_key());
+    double expense = customer->get_key().get_expense();
     auto temp = Output_t<double>(expense-discount);
     return temp;
 }

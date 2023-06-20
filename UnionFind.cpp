@@ -44,6 +44,16 @@ shared_ptr<Record> UnionFind::findSpecified(int dataId)
     return NULL;
 }
 
+shared_ptr<UpTreeNode> UnionFind::findSpecifiedNode(int dataId)
+{
+    shared_ptr<UpTreeNode> node = arr.find(dataId);
+    if (node != NULL){
+        return node;
+    }
+    return NULL;
+}
+
+
 
 shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)
 {
@@ -59,7 +69,7 @@ shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)
     {
         // used for calculating the hight from ground:
         sumR += nodeToRun->semiHight;
-        // ___________________________________
+        // _____________
 
         nodeToRun = nodeToRun->father;
     }
@@ -75,7 +85,7 @@ shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)
         tempR = nodeToRun->semiHight;
         nodeToRun->semiHight = sumR-toSubtract;
         toSubtract += nodeToRun->semiHight;
-        // ___________________________________
+        // _____________
 
 
         shared_ptr<UpTreeNode> currentFather = nodeToRun->father;
@@ -89,7 +99,7 @@ shared_ptr<UpTreeNode> UnionFind::findNode(int dataId)
 
 shared_ptr<UpTreeNode> UnionFind::unionGroups(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2)
 {
-   if(tree1->groupCount >= tree2->groupCount)
+    if(tree1->groupCount >= tree2->groupCount)
     {
         //up tree node recive record as a parameter
         tree2->father = tree1;
@@ -123,35 +133,55 @@ shared_ptr<Record> UnionFind::union_PutOnTop(int r_id1, int r_id2)
 
 
 /// @brief
-/// @param tree1 root of the first record group
-/// @param tree2 root of the second record group
+/// @param treeB root of the first record group
+/// @param treeA root of the second record group
 /// @return
-shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree1, shared_ptr<UpTreeNode> tree2)
+shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> treeB, shared_ptr<UpTreeNode> treeA)
 {
-
-    if(tree1->groupCount >= tree2->groupCount)
+    if (treeB->groupCount <= treeA->groupCount)
     {
-        tree2->father = tree1;
-        tree1->groupCount += tree2->groupCount;
-        tree2->groupCount = -1;
-        // semi hight is r funtion
-        tree2->semiHight = tree2->semiHight + tree1->highFromGround() - tree1->semiHight ;
-        tree1->column = tree2->column;
-        return tree1;
+        treeB->semiHight = treeB->semiHight + (treeA->highFromGround() + treeA->value->get_copies()) - treeA->semiHight;
+        treeA->groupCount += treeB->groupCount;
+        treeB->groupCount = -1;
+        treeB->father = treeA;
+        treeB->column = treeA->column;
+        return treeB;
     }
     else
     {
-        tree1->father = tree2;
-        tree2->groupCount += tree1->groupCount;
-        tree1->groupCount = -1;
-        tree2->semiHight = tree2->semiHight + tree1->highFromGround();
-        tree1->semiHight = tree1->semiHight - tree2->semiHight ;
-        tree1->column = tree2->column;
-        return tree2;
+        treeB->semiHight = treeB->semiHight + (treeA->highFromGround() + treeA->value->get_copies());
+        treeA->semiHight = treeA->semiHight - treeB->semiHight;
+        treeA->father = treeB;
+        treeB->groupCount += treeA->groupCount;
+        treeA->groupCount = -1;
+        treeB->column = treeA->column;
+        return treeA;
     }
-
-
 }
+//shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> treeB, shared_ptr<UpTreeNode> treeA)
+//{
+//
+//    if(treeB->groupCount <= treeA->groupCount)
+//    {
+//        treeB->father = treeA;
+//        treeA->groupCount += treeB->groupCount;
+//        treeB->groupCount = -1;
+//        // semi hight is r funtion
+//        treeB->semiHight = treeB->semiHight + treeA->highFromGround() + treeA->value->get_copies() - treeA->semiHight ;
+//        treeB->column = treeA->column;
+//        return treeB;
+//    }
+//    else
+//    {
+//        treeA->father = treeB;
+//        treeB->groupCount += treeA->groupCount;
+//        treeA->groupCount = -1;
+//        treeB->semiHight = treeB->semiHight + treeA->highFromGround() + treeA->value->get_copies();
+//        treeA->semiHight = treeA->semiHight - treeB->semiHight ;
+//        treeB->column = treeA->column;
+//        return treeA;
+//    }
+//}
 
 
 /// @brief in use for the function getPlace.
@@ -161,11 +191,11 @@ shared_ptr<UpTreeNode> UnionFind::union_PutOnTopNode(shared_ptr<UpTreeNode> tree
 /// @return returns true if the function succeeded
 bool UnionFind::getPlace(int r_id, int *column, int *hight)
 {
-    shared_ptr<UpTreeNode> recordNode = findNode(r_id);
+    shared_ptr<UpTreeNode> recordNode = findSpecifiedNode(r_id);
     if(recordNode == NULL)
         return false;
 
-    *column = recordNode->column;
+    *column = findNode(r_id)->column;
     *hight = recordNode->highFromGround();
     return true;
 }
@@ -177,7 +207,7 @@ int UnionFind::getSize() const
 }
 
 
-//_______________________________________UpTreeNode Functions______________________________________________
+//______________UpTreeNode Functions_______________
 
 int UpTreeNode::highFromGround()//still need to ceack if adding the record copies is true!!!
 {
@@ -191,4 +221,4 @@ int UpTreeNode::highFromGround()//still need to ceack if adding the record copie
     return hight;
 }
 
-//______________________________________________________________________________________________________
+//_________________________________
